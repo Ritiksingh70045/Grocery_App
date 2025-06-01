@@ -1,0 +1,2 @@
+Built a responsive grocery ordering platform with user and seller functionalities. Enabled users to browse products, add items to a dynamic cart, and make secure payments through Stripe integration. Developed a seller dashboard for inventory management, including real-time updates for stock availability. Implemented cart auto-update with price recalculations based on item quantities.
+Tech Stack: React, Node.js, Express.js, MongoDB, Stripe API, HTML, CSS, JavaScript
