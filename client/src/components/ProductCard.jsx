@@ -8,7 +8,15 @@ const ProductCard = ({ product }) => {
 
   return (
     product && (
-      <div onClick={() => {navigate(`/products/${product.category.toLowerCase()}/${product._id}`); scrollTo(0,0)}} className="border border-gray-500/20 rounded-md md:px-4 px-3 py-2 bg-white min-w-56 max-w-56 w-full">
+      <div
+        onClick={() => {
+          navigate(
+            `/products/${product.category.toLowerCase()}/${product._id}`
+          );
+          scrollTo(0, 0);
+        }}
+        className="border border-gray-500/20 rounded-md md:px-4 px-3 py-2 bg-white min-w-56 max-w-56 w-full"
+      >
         <div className="group cursor-pointer flex items-center justify-center px-2">
           <img
             className="group-hover:scale-105 transition max-w-26 md:max-w-36"
@@ -35,9 +43,11 @@ const ProductCard = ({ product }) => {
           </div>
           <div className="flex items-end justify-between mt-3">
             <p className="md:text-xl text-base font-medium text-primary">
-              {currency}{product.offerPrice}{' '}
+              {currency}
+              {product.offerPrice}{' '}
               <span className="text-gray-500/60 md:text-sm text-xs line-through">
-                {currency}{product.price}
+                {currency}
+                {product.price}
               </span>
             </p>
             <div
