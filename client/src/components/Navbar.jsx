@@ -45,9 +45,9 @@ function Navbar() {
 
       {/* Desktop Menu */}
       <div className="hidden sm:flex items-center gap-8">
+        <NavLink to="/seller">Seller Dashboard</NavLink>
         <NavLink to="/">Home</NavLink>
         <NavLink to="/products">All Product</NavLink>
-        <NavLink to="/">Contact</NavLink>
 
         <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
           <input
@@ -99,6 +99,12 @@ function Navbar() {
               >
                 Logout
               </li>
+              <li
+                onClick={() => navigate('update-password')}
+                className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
+              >
+                Update Password
+              </li>
             </ul>
           </div>
         )}
@@ -129,7 +135,7 @@ function Navbar() {
       {/* Mobile Menu */}
       {open && (
         <div
-          className={`${open ? 'flex' : 'hidden'} absolute top-[60px] left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden`}
+          className={`${open ? 'flex' : 'hidden'} z-50 absolute top-[60px] left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden`}
         >
           <NavLink to="/" onClick={() => setOpen(false)}>
             Home
@@ -145,7 +151,9 @@ function Navbar() {
           <NavLink to="/" onClick={() => setOpen(false)}>
             Contact
           </NavLink>
-
+          <NavLink to="/seller" onClick={() => setOpen(false)}>
+            Seller Dashboard
+          </NavLink>
           {!user ? (
             <button
               onClick={() => {

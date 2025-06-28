@@ -3,24 +3,25 @@ import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
 function Login() {
-  const { setShowUserLogin, setUser , axios , navigate} = useAppContext();
+  const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
   const [state, setState] = React.useState('login');
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  
+
   const onSubmitHandler = async (event) => {
     try {
       event.preventDefault();
-      const {data} = await axios.post(`/api/user/${state}` , {name , email , password});
-      if(data.success)
-      {
+      const { data } = await axios.post(`/api/user/${state}`, {
+        name,
+        email,
+        password,
+      });
+      if (data.success) {
         navigate('/');
         setUser(data.user);
         setShowUserLogin(false);
-      }
-      else
-      {
+      } else {
         toast.error(data.message);
       }
     } catch (error) {
@@ -87,15 +88,29 @@ function Login() {
             </span>
           </p>
         ) : (
-          <p>
-            Create an account?{' '}
-            <span
-              onClick={() => setState('register')}
-              className="text-primary cursor-pointer"
-            >
-              click here
-            </span>
-          </p>
+          <>
+            <p>
+              Create an account?{' '}
+              <span
+                onClick={() => setState('register')}
+                className="text-primary cursor-pointer"
+              >
+                click here
+              </span>
+            </p>
+            <p>
+              Forgot Password?{' '}
+              <span
+                onClick={() => {
+                  setShowUserLogin(false); // Close the login modal
+                  navigate('/forgot-password');
+                }}
+                className="text-primary cursor-pointer"
+              >
+                click here
+              </span>
+            </p>
+          </>
         )}
         <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
           {state === 'register' ? 'Create Account' : 'Login'}

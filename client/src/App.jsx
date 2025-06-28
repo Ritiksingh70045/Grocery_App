@@ -18,6 +18,8 @@ import AddProduct from './pages/Seller/AddProduct';
 import ProductList from './pages/Seller/ProductList';
 import Orders from './pages/Seller/Orders';
 import Loading from './components/Loading';
+import UpdatePassword from './components/UpdatePassword';
+import ForgotPassword from './components/ForgotPassword';
 function App() {
   const isSellerPath = useLocation().pathname.includes('seller'); // checks if the URL contains the seller keyword
   const { showUserLogin, isSeller } = useAppContext();
@@ -38,6 +40,8 @@ function App() {
           <Route path="/add-address" element={<AddAddress />} />
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/loader" element={<Loading />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route
             path="/seller"
             element={isSeller ? <SellerLayout /> : <SellerLogin />}

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 // Register User : /api/user/register
+
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -28,7 +29,7 @@ export const register = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true, // Prevent JS to access cookie
       secure: process.env.NODE_ENV === 'production', // use secure cookie in production
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', // CSRF protection
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', // 
       maxAge: 1 * 24 * 60 * 60 * 1000,
     });
 
@@ -115,3 +116,60 @@ export const logout = async (req, res) => {
     return res.json({ success: false, message: error.message });
   }
 };
+
+export const updatePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.id; // ✅ use req.user.id from middleware
+
+    if (!oldPassword || !newPassword) {
+      return res.json({ success: false, message: 'Missing Details' });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.json({ success: false, message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isMatch) {
+      return res.json({ success: false, message: 'Old password is incorrect' });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+    await user.save();
+
+    return res.json({ success: true, message: 'Password updated successfully' });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(404).json({ success: false, message: error.message });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.json({ success: false, message: 'Missing Details' });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.json({ success: false, message: 'User not found' });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+    await user.save();
+
+    return res.json({ success: true, message: 'Password changed successfully' });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(404).json({ success: false, message: error.message });
+  }
+}
