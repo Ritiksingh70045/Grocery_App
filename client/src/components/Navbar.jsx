@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets.js';
 import { useAppContext } from '../context/AppContext.jsx';
 import toast from 'react-hot-toast';
-import { set } from 'mongoose';
 
 function Navbar() {
   const [open, setOpen] = React.useState(false);
