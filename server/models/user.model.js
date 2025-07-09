@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+
 const userSchema = new Schema(
   {
     name: {
@@ -18,6 +19,12 @@ const userSchema = new Schema(
       type: Object,
       default: {},
     },
+    orders: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'order',
+      },
+    ],
   },
   { minimize: false }
 );

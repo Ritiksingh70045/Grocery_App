@@ -42,10 +42,15 @@ const orderSchema = new Schema(
       required: true,
       default: false,
     },
+    sellerId: {
+      type: Schema.Types.ObjectId,
+      ref: 'seller',
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-const Order = mongoose.models.order || mongoose.model('order', orderSchema);  // Ensure model is only created once , use of models to check if the model already exists and also help in hot reloading during development . What is hot reloading ? => It is a feature that allows developers to see the changes they make in their code without having to refresh the entire application. This is particularly useful in development environments, as it speeds up the development process by allowing developers to see the effects of their changes immediately.
+const Order = mongoose.models.order || mongoose.model('order', orderSchema); // Ensure model is only created once , use of models to check if the model already exists and also help in hot reloading during development . What is hot reloading ? => It is a feature that allows developers to see the changes they make in their code without having to refresh the entire application. This is particularly useful in development environments, as it speeds up the development process by allowing developers to see the effects of their changes immediately.
 
 export default Order;

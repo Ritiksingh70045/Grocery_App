@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { assets } from '../assets/assets.js';
 import { useAppContext } from '../context/AppContext.jsx';
 import toast from 'react-hot-toast';
+import { set } from 'mongoose';
 
 function Navbar() {
   const [open, setOpen] = React.useState(false);
@@ -15,6 +16,8 @@ function Navbar() {
     searchQuery,
     getCartCount,
     axios,
+    selectedSeller,
+    setSelectedSeller,
   } = useAppContext();
 
   const logout = async () => {
@@ -23,6 +26,7 @@ function Navbar() {
       if (data.success) {
         toast.success(data.message);
         setUser(null);
+        setSelectedSeller(null);
         navigate('/');
       } else {
         toast.error(data.message);
@@ -32,11 +36,6 @@ function Navbar() {
     }
   };
 
-  // useEffect(() => {
-  //   setUser(null);
-  //   navigate('/products');
-  // },[]);
-
   return (
     <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
       <NavLink to="/" onClick={() => setOpen(false)}>
@@ -45,14 +44,21 @@ function Navbar() {
 
       {/* Desktop Menu */}
       <div className="hidden sm:flex items-center gap-8">
-        <NavLink to="/seller">Seller Dashboard</NavLink>
+        {!user && <NavLink to="/seller">Seller Dashboard</NavLink>}
+          <NavLink
+            to="/seller-list"
+            onClick={() => {
+              navigate('/seller-list');
+            }}
+          >
+            Seller List
+          </NavLink>
         <NavLink to="/">Home</NavLink>
-        <NavLink to="/products">All Product</NavLink>
 
         <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
           <input
             onChange={(e) => {
-              navigate('/products');
+              navigate(selectedSeller ? `user/${selectedSeller?._id}/products` : '/no-seller');
               setSearchQuery(e.target.value);
             }}
             className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500"
@@ -63,7 +69,7 @@ function Navbar() {
         </div>
 
         <div
-          onClick={() => navigate('/cart')}
+          onClick={() => navigate(`/user/${selectedSeller?._id}/cart`)}
           className="relative cursor-pointer"
         >
           <img
@@ -100,10 +106,16 @@ function Navbar() {
                 Logout
               </li>
               <li
-                onClick={() => navigate('update-password')}
+                onClick={() => navigate('/update-password')}
                 className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
               >
                 Update Password
+              </li>
+              <li
+                onClick={() => navigate('/seller-list')}
+                className="p-1.5 pl-3 hover:bg-primary/10 cursor-pointer"
+              >
+                Sellers List
               </li>
             </ul>
           </div>
@@ -120,7 +132,7 @@ function Navbar() {
             className="w-6 opacity-80"
           />
           <button className="absolute -top-2 -right-3 text-xs text-white bg-primary w-[18px] h-[18px] rounded-full">
-            {getCartCount()}
+            {user ? getCartCount() : 0}
           </button>
         </div>
         <button
@@ -140,17 +152,14 @@ function Navbar() {
           <NavLink to="/" onClick={() => setOpen(false)}>
             Home
           </NavLink>
-          <NavLink to="/products" onClick={() => setOpen(false)}>
-            All Product
+          <NavLink to="/seller-list" onClick={() => setOpen(false)}>
+            Seller List
           </NavLink>
           {user && (
-            <NavLink to="/products" onClick={() => setOpen(false)}>
+            <NavLink to="/my-orders" onClick={() => setOpen(false)}>
               My Orders
             </NavLink>
           )}
-          <NavLink to="/" onClick={() => setOpen(false)}>
-            Contact
-          </NavLink>
           <NavLink to="/seller" onClick={() => setOpen(false)}>
             Seller Dashboard
           </NavLink>

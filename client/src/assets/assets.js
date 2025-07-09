@@ -138,8 +138,8 @@ export const categories = [
     bgColor: "#E0F6FE",
   },
   {
-    text: "Grains & Cereals",
-    path: "Grains",
+    text: "Others",
+    path: "Others",
     image: grain_image,
     bgColor: "#F1E3F9",
   },

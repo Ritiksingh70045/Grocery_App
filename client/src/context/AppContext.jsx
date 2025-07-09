@@ -9,27 +9,29 @@ axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 export const AppContext = createContext();
 
-export const AppContextProvider = ({ children }) => {
-  const currency = import.meta.env.VITE_CURRENCY; // To use the .env data
+ const AppContextProvider = ({ children }) => {
+  const currency = import.meta.env.VITE_CURRENCY;
   const navigate = useNavigate();
+
   const [user, setUser] = useState(null);
-  const [isSeller, setIsSeller] = useState(false);
+  const [seller, setSeller] = useState(null);
   const [showUserLogin, setShowUserLogin] = useState(false);
+  const [showSellerLogin, setShowSellerLogin] = useState(false);
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [searchQuery, setSearchQuery] = useState({});
+  const [selectedSeller, setSelectedSeller] = useState(null);
 
   const fetchUser = async () => {
     try {
       const { data } = await axios.get('/api/user/is-auth');
       if (data.success) {
         setUser(data.user);
-
         if (Object.keys(data.user.cartItems).length > 0) {
           setCartItems(data.user.cartItems);
         }
       }
-    } catch (error) {
+    } catch {
       setUser(null);
     }
   };
@@ -38,31 +40,47 @@ export const AppContextProvider = ({ children }) => {
     try {
       const { data } = await axios.get('/api/seller/is-auth');
       if (data.success) {
-        setIsSeller(true);
+        setSeller(data.seller);
       } else {
-        setIsSeller(false);
+        setSeller(null);
       }
-    } catch (error) {
-      setIsSeller(false);
+    } catch {
+      setSeller(null);
     }
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (sellerId = null) => {
     try {
-      const { data } = await axios.get('/api/product/list');
+      const { data } = await axios.get(
+        sellerId ? `/api/user/${sellerId}/products` : '/api/user/products'
+      );
       if (data.success) {
         setProducts(data.products);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || 'Failed to fetch products');
     }
   };
+
+useEffect(() => {
+  if (seller?._id) {
+    fetchProducts(seller._id);
+  }
+}, [seller]);
+
+
+  useEffect(() => {
+    if (selectedSeller) {
+      setCartItems({});
+      fetchProducts(selectedSeller._id);
+    }
+  }, [selectedSeller]);
+
   useEffect(() => {
     fetchUser();
     fetchSeller();
-    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -82,15 +100,22 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [cartItems]);
 
-  // Add to Cart
+  useEffect(() => {
+    if (selectedSeller) {
+      setCartItems({});
+    }
+  }, [selectedSeller]);
+
+  useEffect(() => {
+    if (!seller) {
+      setProducts([]);
+    }
+  }, [seller]);
+
+  // Cart handlers
   const addToCart = (itemId) => {
     let cartData = structuredClone(cartItems);
-
-    if (cartData[itemId]) {
-      cartData[itemId] += 1;
-    } else {
-      cartData[itemId] = 1;
-    }
+    cartData[itemId] = (cartData[itemId] || 0) + 1;
     setCartItems(cartData);
     toast.success('Added to Cart');
   };
@@ -102,8 +127,6 @@ export const AppContextProvider = ({ children }) => {
     toast.success('Cart Updated');
   };
 
-  // Remove prod from cart
-
   const removeFromCart = (itemId) => {
     let cartData = structuredClone(cartItems);
     if (cartData[itemId]) {
@@ -112,54 +135,56 @@ export const AppContextProvider = ({ children }) => {
         delete cartData[itemId];
       }
     }
-    toast.success('Removed from Cart');
     setCartItems(cartData);
+    toast.success('Removed from Cart');
   };
 
   const getCartCount = () => {
-    let totalCount = 0;
-    for (const item in cartItems) {
-      totalCount += cartItems[item];
-    }
-    return totalCount;
+    return Object.values(cartItems).reduce((sum, qty) => sum + qty, 0);
   };
 
   const getCartAmount = () => {
     let totalAmount = 0;
-    for (const items in cartItems) {
-      let itemInfo = products.find((product) => product._id === items);
-      if (cartItems[items] > 0) {
-        totalAmount += itemInfo.offerPrice * cartItems[items];
+    for (const id in cartItems) {
+      const product = products.find((p) => p._id === id);
+      if (product) {
+        totalAmount += product.offerPrice * cartItems[id];
       }
     }
-
     return Math.floor(totalAmount * 100) / 100;
   };
+
   const value = {
     navigate,
     user,
     setUser,
-    isSeller,
-    setIsSeller,
+    seller,
+    setSeller,
     showUserLogin,
     setShowUserLogin,
+    showSellerLogin,
+    setShowSellerLogin,
     products,
     currency,
     addToCart,
     updateCartItem,
     removeFromCart,
     cartItems,
-    searchQuery,
-    setSearchQuery,
+    setCartItems,
     getCartAmount,
     getCartCount,
+    searchQuery,
+    setSearchQuery,
     axios,
     fetchProducts,
-    setCartItems,
+    selectedSeller,
+    setSelectedSeller,
   };
+
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
+export { AppContextProvider };
 export const useAppContext = () => {
   return useContext(AppContext);
 };

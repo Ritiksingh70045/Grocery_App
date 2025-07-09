@@ -16,7 +16,7 @@ const InputField = ({ type, placeholder, name, onChange, value }) => (
 );
 
 const AddAddress = () => {
-  const { axios, user, navigate } = useAppContext();
+  const { axios, user, navigate , selectedSeller} = useAppContext();
 
   const [address, setAddress] = useState({
     firstName: '',
@@ -45,7 +45,7 @@ const AddAddress = () => {
 
       if (data.success) {
         toast.success(data.message);
-        navigate('/cart');
+        navigate(`/user/${selectedSeller?._id}/cart`);
       } else {
         toast.error(data.message);
       }

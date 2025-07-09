@@ -17,13 +17,15 @@ const ProductCard = ({ product }) => {
         }}
         className="border border-gray-500/20 rounded-md md:px-4 px-3 py-2 bg-white min-w-56 max-w-56 w-full"
       >
-        <div className="group cursor-pointer flex items-center justify-center px-2">
+        {/* Image Wrapper with fixed height and object-contain */}
+        <div className="group cursor-pointer flex items-center justify-center h-36 mb-2 overflow-hidden">
           <img
-            className="group-hover:scale-105 transition max-w-26 md:max-w-36"
+            className="group-hover:scale-105 transition h-full object-contain"
             src={product.image[0]}
             alt={product.name}
           />
         </div>
+
         <div className="text-gray-500/60 text-sm">
           <p>{product.category}</p>
           <p className="text-gray-700 font-medium text-lg truncate w-full">
@@ -37,10 +39,12 @@ const ProductCard = ({ product }) => {
                   key={i}
                   className="md:w-3.5 w-3"
                   src={i < 4 ? assets.star_icon : assets.star_dull_icon}
+                  alt="rating"
                 />
               ))}
             <p>(4)</p>
           </div>
+
           <div className="flex items-end justify-between mt-3">
             <p className="md:text-xl text-base font-medium text-primary">
               {currency}
@@ -50,6 +54,7 @@ const ProductCard = ({ product }) => {
                 {product.price}
               </span>
             </p>
+
             <div
               onClick={(e) => {
                 e.stopPropagation();
@@ -58,7 +63,7 @@ const ProductCard = ({ product }) => {
             >
               {!cartItems[product._id] ? (
                 <button
-                  className="flex items-center justify-center gap-1 bg-primary/10  cursor-pointer border border-primary/40 md:w-[80px] w-[64px] h-[34px] rounded "
+                  className="flex items-center justify-center gap-1 bg-primary/10 cursor-pointer border border-primary/40 md:w-[80px] w-[64px] h-[34px] rounded"
                   onClick={() => addToCart(product._id)}
                 >
                   <img src={assets.cart_icon} alt="cart_icon" />
@@ -94,4 +99,5 @@ const ProductCard = ({ product }) => {
     )
   );
 };
+
 export default ProductCard;

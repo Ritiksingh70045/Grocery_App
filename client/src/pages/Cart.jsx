@@ -16,6 +16,7 @@ const Cart = () => {
     getCartAmount,
     axios,
     setCartItems,
+    selectedSeller,
   } = useAppContext();
 
   const [showAddress, setShowAddress] = useState(false);
@@ -94,7 +95,15 @@ const Cart = () => {
         }
       }
     } catch (error) {
-      toast.error(error.message);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Something went wrong');
+      }
     }
   };
   useEffect(() => {
@@ -191,7 +200,7 @@ const Cart = () => {
 
         <button
           onClick={() => {
-            navigate('/products');
+            navigate(`/user/${selectedSeller?._id}/products`);
             scrollTo(0, 0);
           }}
           className="group cursor-pointer flex items-center mt-8 gap-2 text-primary font-medium"

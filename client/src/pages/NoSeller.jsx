@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import ProductCard from '../components/ProductCard';
 import toast from 'react-hot-toast';
 
-function AllProducts() {
+function NoSeller() {
   const { axios, searchQuery } = useAppContext();
   const { sellerId } = useParams();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
 
-  // Fetch products of a seller
   useEffect(() => {
     const fetchSellerProducts = async () => {
       try {
@@ -28,7 +27,6 @@ function AllProducts() {
     if (sellerId) fetchSellerProducts();
   }, [sellerId]);
 
-  // Filter based on search query
   useEffect(() => {
     if (searchQuery.length > 0) {
       setFilteredProducts(
@@ -40,6 +38,26 @@ function AllProducts() {
       setFilteredProducts(allProducts);
     }
   }, [allProducts, searchQuery]);
+
+  // Show helpful message if no seller is selected
+  if (!sellerId) {
+    return (
+      <div className="mt-24 flex flex-col items-center justify-center text-center px-4">
+        <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">
+          No Seller Selected
+        </h2>
+        <p className="text-gray-600 mt-2 text-base sm:text-lg max-w-md">
+          Please choose a seller from the seller list to explore their available products.
+        </p>
+        <Link
+          to="/seller-list"
+          className="mt-6 px-6 py-2 bg-primary hover:bg-primary-dull text-white rounded-full text-sm sm:text-base transition"
+        >
+          Browse Sellers
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-16 flex flex-col">
@@ -58,4 +76,4 @@ function AllProducts() {
   );
 }
 
-export default AllProducts;
+export default NoSeller;

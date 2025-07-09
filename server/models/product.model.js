@@ -29,6 +29,11 @@ const productSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    sellerId: {
+      type: Schema.Types.ObjectId,
+      ref: 'seller',
+      required: true,
+    },
   },
   { timestamps: true }
 );
