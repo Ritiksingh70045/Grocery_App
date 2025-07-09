@@ -12,6 +12,7 @@ function Loading() {
   useEffect(() => {
     if (success === 'true') {
       setCartItems({});
+      localStorage.removeItem("cartItems");
     }
 
     if (nextUrl) {

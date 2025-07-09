@@ -45,7 +45,7 @@ const AddAddress = () => {
 
       if (data.success) {
         toast.success(data.message);
-        navigate(`/user/${selectedSeller?._id}/cart`);
+        navigate('/cart');
       } else {
         toast.error(data.message);
       }

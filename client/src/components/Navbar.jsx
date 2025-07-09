@@ -68,7 +68,7 @@ function Navbar() {
         </div>
 
         <div
-          onClick={() => navigate(`/user/${selectedSeller?._id}/cart`)}
+          onClick={() => navigate('/cart')}
           className="relative cursor-pointer"
         >
           <img
@@ -122,7 +122,7 @@ function Navbar() {
       </div>
       <div className="flex items-center gap-6 sm:hidden">
         <div
-          onClick={() => navigate(`/user/${selectedSeller?._id}/cart`)}
+          onClick={() => navigate('/cart')}
           className="relative cursor-pointer"
         >
           <img
