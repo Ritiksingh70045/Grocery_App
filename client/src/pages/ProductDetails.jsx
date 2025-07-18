@@ -11,7 +11,7 @@ const ProductDetails = () => {
   const [thumbnail, setThumbnail] = useState(null);
 
   const product = products.find((item) => item._id === id);
-
+  const sellerId = product?.sellerId;
   useEffect(() => {
     if (products.length > 0) {
       let productsCopy = products.slice();
@@ -103,7 +103,7 @@ const ProductDetails = () => {
               <ProductCard key={index} product={product}/>
             ))}
           </div>
-          <button onClick={() => {navigate('/products');scrollTo(0,0)}} className='mx-auto cursor-pointer px-12 my-16 py-2.5 border rounded text-primary hover:bg-primary/10 transition'>See more</button>
+          <button onClick={() => {navigate(`/user/${sellerId}/products`);scrollTo(0,0)}} className='mx-auto cursor-pointer px-12 my-16 py-2.5 border rounded text-primary hover:bg-primary/10 transition'>See more</button>
         </div>
       </div>
     )

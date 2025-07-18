@@ -22,19 +22,25 @@ const Cart = () => {
   const [showAddress, setShowAddress] = useState(false);
   const [cartArray, setCartArray] = useState([]);
   const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null); 
+  const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentOption, setPaymentOption] = useState('COD');
+  const [sellerId, setSellerId] = useState(null);
+
 
   setCartItems(cartItems);
-
   const getCart = () => {
     let tempArray = [];
+    let tempSellerId = null;
     for (const key in cartItems) {
       const product = products.find((item) => item._id === key);
+      if ((tempSellerId == null)  && product) {
+        tempSellerId = product.sellerId;
+      }
       product.quantity = cartItems[key];
       tempArray.push(product);
     }
     setCartArray(tempArray);
+    setSellerId(tempSellerId);
   };
 
   const getUserAddress = async () => {
@@ -200,7 +206,9 @@ const Cart = () => {
 
         <button
           onClick={() => {
-            navigate(`/user/${selectedSeller?._id}/products`);
+            navigate(
+              sellerId != null ? `/user/${sellerId}/products` : '/seller-list'
+            );
             scrollTo(0, 0);
           }}
           className="group cursor-pointer flex items-center mt-8 gap-2 text-primary font-medium"

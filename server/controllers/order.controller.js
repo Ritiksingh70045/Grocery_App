@@ -186,12 +186,18 @@ export const stripeWebhooks = async (request, response) => {
 
     case 'payment_intent.payment_failed': {
       const paymentIntent = event.data.object;
-      const session = await stripeInstance.checkout.sessions.list({
+
+      // Step 1: Get session from paymentIntent
+      const sessions = await stripeInstance.checkout.sessions.list({
         payment_intent: paymentIntent.id,
       });
 
-      const { orderId } = session.data[0].metadata;
-      await Order.findById(orderId);
+      const session = sessions.data[0];
+
+      const orderId = session.metadata.orderId;
+
+      // Step 2: Delete the failed order
+      await Order.findByIdAndDelete(orderId);
       break;
     }
 
