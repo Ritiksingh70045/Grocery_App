@@ -9,7 +9,7 @@ function AllProducts() {
   const { sellerId } = useParams();
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
-
+  
   // Fetch products of a seller
   useEffect(() => {
     const fetchSellerProducts = async () => {

@@ -19,7 +19,7 @@ export const AppContext = createContext();
   const [showSellerLogin, setShowSellerLogin] = useState(false);
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState({});
-  const [searchQuery, setSearchQuery] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedSeller, setSelectedSeller] = useState(null);
 
   const fetchUser = async () => {
@@ -74,6 +74,7 @@ useEffect(() => {
   useEffect(() => {
     if (selectedSeller) {
       setCartItems({});
+      setSearchQuery('');
       fetchProducts(selectedSeller._id);
     }
   }, [selectedSeller]);
