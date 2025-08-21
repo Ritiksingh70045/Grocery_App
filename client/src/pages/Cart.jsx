@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { assets, dummyAddress } from '../assets/assets';
+import { assets } from '../assets/assets';
 import toast from 'react-hot-toast';
 
 const Cart = () => {
   const {
     user,
-    products,
     currency,
     cartItems,
     removeFromCart,
@@ -16,7 +15,7 @@ const Cart = () => {
     getCartAmount,
     axios,
     setCartItems,
-    selectedSeller,
+    fetchUser,
   } = useAppContext();
 
   const [showAddress, setShowAddress] = useState(false);
@@ -26,21 +25,40 @@ const Cart = () => {
   const [paymentOption, setPaymentOption] = useState('COD');
   const [sellerId, setSellerId] = useState(null);
 
-
-  setCartItems(cartItems);
-  const getCart = () => {
-    let tempArray = [];
-    let tempSellerId = null;
-    for (const key in cartItems) {
-      const product = products.find((item) => item._id === key);
-      if ((tempSellerId == null)  && product) {
-        tempSellerId = product.sellerId;
+  // ✅ Fetch cart products from DB using productIds
+  const getCart = async () => {
+    try {
+      const productIds = Object.keys(cartItems);
+      if (productIds.length === 0) {
+        setCartArray([]);
+        setSellerId(null);
+        return;
       }
-      product.quantity = cartItems[key];
-      tempArray.push(product);
+
+      const { data } = await axios.post('/api/cart/cart-products', {
+        productIds,
+      });
+
+      if (data.success) {
+        let tempArray = [];
+        let tempSellerId = null;
+
+        data.products.forEach((product) => {
+          if (tempSellerId == null) {
+            tempSellerId = product.sellerId;
+          }
+          product.quantity = cartItems[product._id] || 0;
+          tempArray.push(product);
+        });
+
+        setCartArray(tempArray);
+        setSellerId(tempSellerId);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-    setCartArray(tempArray);
-    setSellerId(tempSellerId);
   };
 
   const getUserAddress = async () => {
@@ -58,72 +76,69 @@ const Cart = () => {
       toast.error(error.message);
     }
   };
+
   const placeOrder = async () => {
     try {
       if (!selectedAddress) {
         return toast.error('Please Select an address');
       }
 
-      //Place order with COD
+      const orderPayload = {
+        userId: user._id,
+        items: cartArray.map((item) => ({
+          product: item._id,
+          quantity: item.quantity,
+        })),
+        address: selectedAddress._id,
+      };
 
       if (paymentOption === 'COD') {
-        const { data } = await axios.post('/api/order/cod', {
-          userId: user._id,
-          items: cartArray.map((item) => ({
-            product: item._id,
-            quantity: item.quantity,
-          })),
-          address: selectedAddress._id,
-        });
-
+        const { data } = await axios.post('/api/order/cod', orderPayload);
         if (data.success) {
           toast.success(data.message);
-          setCartItems({});
-          user.cartItems = {};
+          setCartItems({}); // clears context cart immediately
+          setCartArray([]); // clears current page list immediately
+          await fetchUser(); // resync user + cart from server (comes back {})
           navigate('/my-orders');
         } else {
           toast.error(data.message);
         }
       } else {
-        const { data } = await axios.post('/api/order/stripe', {
-          userId: user._id,
-          items: cartArray.map((item) => ({
-            product: item._id,
-            quantity: item.quantity,
-          })),
-          address: selectedAddress._id,
-        });
-
+        const { data } = await axios.post('/api/order/stripe', orderPayload);
         if (data.success) {
+          setCartItems({}); // clears context cart immediately
+          setCartArray([]); // clears current page list immediately
+          await fetchUser(); // resync user + cart from server (comes back {})
           window.location.replace(data.url);
         } else {
           toast.error(data.message);
         }
       }
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
+      if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
         toast.error('Something went wrong');
       }
     }
   };
+
+  // 🔄 Rebuild cart when cartItems change
   useEffect(() => {
-    if (products.length > 0 && cartItems) {
+    if (Object.keys(cartItems).length > 0) {
       getCart();
+    } else {
+      setCartArray([]);
     }
-  }, [products, cartItems]);
+  }, [cartItems]);
 
   useEffect(() => {
     if (user) {
       getUserAddress();
     }
   }, [user]);
-  return products.length > 0 && cartItems ? (
+
+  return cartArray.length > 0 ? (
     <div className="flex flex-col md:flex-row mt-16">
       <div className="flex-1 max-w-4xl">
         <h1 className="text-3xl font-medium mb-6">
@@ -222,6 +237,7 @@ const Cart = () => {
         </button>
       </div>
 
+      {/* Right Side Order Summary */}
       <div className="max-w-[360px] w-full bg-gray-100/40 p-5 max-md:mt-16 border border-gray-300/70">
         <h2 className="text-xl md:text-xl font-medium">Order Summary</h2>
         <hr className="border-gray-300 my-5" />
@@ -242,15 +258,16 @@ const Cart = () => {
             </button>
             {showAddress && (
               <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
-                {addresses.map((address, _) => (
+                {addresses.map((address, i) => (
                   <p
+                    key={i}
                     onClick={() => {
                       setSelectedAddress(address);
                       setShowAddress(false);
                     }}
                     className="text-gray-500 p-2 hover:bg-gray-100"
                   >
-                    {address.street}, {address.city},{address.state},{' '}
+                    {address.street}, {address.city}, {address.state},{' '}
                     {address.country}
                   </p>
                 ))}

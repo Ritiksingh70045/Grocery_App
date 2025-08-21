@@ -212,7 +212,7 @@ export const stripeWebhooks = async (request, response) => {
 export const getUserOrders = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log('Fetching orders for user:', req.user.id);
+    // console.log('Fetching orders for user:', req.user.id);
 
     const orders = await Order.find({
       userId,
@@ -221,7 +221,7 @@ export const getUserOrders = async (req, res) => {
       .populate('items.product address sellerId')
       .sort({ createdAt: -1 });
 
-    console.log('Found orders:', orders.length);
+    // console.log('Found orders:', orders.length);
 
     return res.json({ success: true, orders });
   } catch (error) {

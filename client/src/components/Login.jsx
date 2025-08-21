@@ -3,7 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
 function Login() {
-  const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
+  const { setShowUserLogin, setUser, axios, navigate, fetchUser } = useAppContext();
   const [state, setState] = React.useState('login');
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
@@ -20,6 +20,7 @@ function Login() {
       if (data.success) {
         navigate('/');
         setUser(data.user);
+        fetchUser();
         setShowUserLogin(false);
       } else {
         toast.error(data.message);

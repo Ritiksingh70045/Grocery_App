@@ -9,7 +9,7 @@ axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 export const AppContext = createContext();
 
- const AppContextProvider = ({ children }) => {
+const AppContextProvider = ({ children }) => {
   const currency = import.meta.env.VITE_CURRENCY;
   const navigate = useNavigate();
 
@@ -27,12 +27,15 @@ export const AppContext = createContext();
       const { data } = await axios.get('/api/user/is-auth');
       if (data.success) {
         setUser(data.user);
-        if (Object.keys(data.user.cartItems).length > 0) {
-          setCartItems(data.user.cartItems);
-        }
+        // <-- always sync cart from server (even when empty)
+        setCartItems(data.user.cartItems || {});
+      } else {
+        setUser(null);
+        setCartItems({});
       }
     } catch {
       setUser(null);
+      setCartItems({});
     }
   };
 
@@ -64,12 +67,11 @@ export const AppContext = createContext();
     }
   };
 
-useEffect(() => {
-  if (seller?._id) {
-    fetchProducts(seller._id);
-  }
-}, [seller]);
-
+  useEffect(() => {
+    if (seller?._id) {
+      fetchProducts(seller._id);
+    }
+  }, [seller]);
 
   useEffect(() => {
     if (selectedSeller) {
@@ -83,6 +85,8 @@ useEffect(() => {
     fetchUser();
     fetchSeller();
   }, []);
+
+
 
   useEffect(() => {
     const updateCart = async () => {
@@ -180,6 +184,7 @@ useEffect(() => {
     fetchProducts,
     selectedSeller,
     setSelectedSeller,
+    fetchUser,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
