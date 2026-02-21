@@ -13,7 +13,7 @@ const authSeller = async (req, res, next) => {
   try {
     const decoded = jwt.verify(sellerToken, process.env.JWT_SECRET);
 
-    // ✅ Check if seller with decoded.id exists
+    // ✅ Check if seller with decoded.id exists ot not
     const seller = await Seller.findById(decoded.id).select('-password');
     if (!seller) {
       return res.json({ success: false, message: 'Seller not found' });
