@@ -15,7 +15,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    cartItems: {
+    cartItems: {               // key is product_id and value corresponding to that key is quantity of that product in the cart 
       type: Object,
       default: {},
     },
